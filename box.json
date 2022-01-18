@@ -1,0 +1,26 @@
+{
+    "name":"DPD DE CFML",
+    "version":"0.1.0",
+    "author":"Gary Stanton",
+    "location":"GaryStanton/dpdde-cfml#v0.1.0",
+    "repository":{
+        "type":"git",
+        "URL":"https://github.com/GaryStanton/dpdde-cfml"
+    },
+    "bugs":"https://github.com/GaryStanton/dpdde-cfml/issues",
+    "slug":"dpddecfml",
+    "shortDescription":"This module provides a wrapper for DPD DE functionality",
+    "type":"modules",
+    "keywords":"DPD DE CFML ColdFusion Lucee",
+    "scripts":{
+        "postVersion":"package set location='GaryStanton/dpdde-cfml#v`package version`'",
+        "onRelease":"publish",
+        "postPublish":"!git push --follow-tags"
+    },
+    "dependencies":{
+        "spreadsheet-cfml":"^3.2.5"
+    },
+    "installPaths":{
+        "spreadsheet-cfml":"modules/spreadsheet-cfml/"
+    }
+}
