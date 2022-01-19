@@ -1,8 +1,8 @@
 {
     "name":"DPD DE CFML",
-    "version":"0.1.0",
+    "version":"0.1.1",
     "author":"Gary Stanton",
-    "location":"GaryStanton/dpdde-cfml#v0.1.0",
+    "location":"GaryStanton/dpdde-cfml#v0.1.1",
     "repository":{
         "type":"git",
         "URL":"https://github.com/GaryStanton/dpdde-cfml"
