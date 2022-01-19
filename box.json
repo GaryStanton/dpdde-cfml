@@ -19,8 +19,5 @@
     },
     "dependencies":{
         "spreadsheet-cfml":"^3.2.5"
-    },
-    "installPaths":{
-        "spreadsheet-cfml":"modules/spreadsheet-cfml/"
     }
 }

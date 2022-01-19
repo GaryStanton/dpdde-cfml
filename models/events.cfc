@@ -14,6 +14,7 @@ component singleton accessors="true" {
 	property name="filePath" 		type="string" default="#GetDirectoryFromPath(GetCurrentTemplatePath())#../store/";
 	property name="connectionName"  type="string" default="DPDDEConnection_#CreateUUID()#";
 	property name="connectionOpen"  type="boolean" default="false";
+	property name="spreadsheet" 	type="any" default="false";
 
 
 	/**
@@ -23,15 +24,24 @@ component singleton accessors="true" {
 	 * @sftpUsername    Your SFTP sftpUsername, provided by DPD DE
 	 * @sftpKeyfile     The location of your private key file used for authentication. Should be a .ppk file hosted on the server.
 	 * @filePath    	The filesystem location to use when processing files. Defaults to /store.
+	 * @spreadsheetObj	This module makes use of SpreadsheetCMFL. Installing the module will install SpreadsheetCFML as a dependancy, but if you need to override its location you can pass an instantiated spreadsheet here.
 	 */
 	public events function init(
 			string sftpServer
 		,   required string sftpUsername
 		,   required string sftpKeyfile
 		,   string filePath
+		,	spreadsheetObj
 	){  
 		if (structKeyExists(Arguments, 'sftpServer')) {
 			setSftpServer(Arguments.sftpServer);
+		}
+
+		if (StructKeyExists(Arguments, 'spreadsheetObj')) {
+			setSpreadsheet(Arguments.spreadsheetObj);
+		}
+		else {
+			setSpreadsheet(new 'modules.spreadsheet-cfml.Spreadsheet'());
 		}
 
 		setSftpUsername(Arguments.sftpUsername);
@@ -299,14 +309,19 @@ component singleton accessors="true" {
 		,	ArgumentCollection 	= Arguments
 		);
 
-		Local.spreadsheet = new 'modules.spreadsheet-cfml.Spreadsheet'();
+		Local.spreadsheet = getSpreadsheet();
 
 		for (Local.thisFile in Local.fileList) {
 			Local.data = Local.spreadsheet.csvToQuery(
-				csv = fileRead(getFilePath() & Local.thisFile.name)
-			, 	firstRowIsHeader = true
-			,	delimiter = ';'
+					csv = fileRead(getFilePath() & Local.thisFile.name)
+				, 	firstRowIsHeader = true
+				,	delimiter = ';'
 			);
+
+			Local.data.addColumn('Filename', 'varchar', []);
+			for (Local.thisRecord in Local.data) {
+				Local.data.FileName[Local.data.CurrentRow] = Local.thisFile.name;
+			}
 
 			if (!StructKeyExists(Local, 'queryObject')) {
 				Local.queryObject = duplicate(Local.data);
@@ -316,6 +331,11 @@ component singleton accessors="true" {
 					SELECT * FROM [Local.queryObject]
 					UNION
 					SELECT * FROM [Local.data]
+				", {} , {dbtype="query"});
+
+				Local.queryObject = queryExecute("
+					SELECT * FROM [Local.queryObject]
+					ORDER BY SCAN_DATE_TIME ASC
 				", {} , {dbtype="query"});
 			}
 		}
